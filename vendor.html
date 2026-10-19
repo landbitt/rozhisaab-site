@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roz Hisaab for milkmen, maids and service people</title>
+<meta name="description" content="Keep every customer's daily hisaab in one free app. Milk, newspaper, water, ironing, tiffin. Send the monthly bill on WhatsApp and get paid on UPI.">
+<link rel="icon" href="img/icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Hind:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F6F3EE;--ink:#1D2A28;--muted:#5E6B68;--brand:#14453D;--brand2:#1F6255;--gold:#F0B444;--card:#fff;--line:#E8E2D9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Hind,system-ui,sans-serif;font-size:18px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left))}
+header{background:linear-gradient(155deg,var(--brand2),var(--brand));color:#fff;padding-block:22px 44px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Baloo 2",sans-serif;font-weight:700;font-size:22px;color:#fff;text-decoration:none}
+.brand img{width:38px;height:38px;border-radius:11px}
+h1{font-family:"Baloo 2",sans-serif;font-size:clamp(32px,8vw,48px);line-height:1.08;margin:28px 0 10px;text-wrap:balance}
+h1 span{color:var(--gold)}
+.hi{opacity:.9;margin:0 0 22px}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--gold);color:#1D1400;font-weight:600;padding:14px 22px;border-radius:14px;text-decoration:none;min-height:52px}
+.cta.alt{background:rgba(255,255,255,.14);color:#fff}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.code{margin-top:16px;font-size:16px;opacity:.9}.code b{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:8px;letter-spacing:1px}
+section{padding-block:36px}
+h2{font-family:"Baloo 2",sans-serif;font-size:28px;margin:0 0 16px}
+.steps{display:grid;gap:12px;counter-reset:s}
+.steps div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px 16px 64px;position:relative}
+.steps div::before{counter-increment:s;content:counter(s);position:absolute;left:16px;top:16px;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:600}
+.steps b{display:block}.steps p{margin:2px 0 0;color:var(--muted);font-size:16px}
+.bill{background:#E7F7EF;border-radius:16px;padding:16px;font-family:ui-monospace,monospace;font-size:15px;white-space:pre-line;border:1px solid #CDEBDC}
+footer{color:var(--muted);font-size:14px;padding-block:28px;border-top:1px solid var(--line)}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./"><img src="img/icon.png" alt="">Roz Hisaab</a>
+  <h1>Every customer's hisaab, <span>in your phone</span>.</h1>
+  <p class="hi">दूधवाला, पेपरवाला, पानी, प्रेस, टिफ़िन। हर ग्राहक का रोज़ का हिसाब एक ऐप में, मुफ़्त। महीने के आख़िर में बिल WhatsApp पर भेजें और UPI पर पैसे पाएं।</p>
+  <div class="ctas"><a class="cta" id="get" href="https://play.google.com/store/apps/details?id=in.rozhisaab.app">Download free on Google Play</a><a class="cta alt" href="https://wa.me/919625746088?text=Namaste%2C%20I%20deliver%20to%20customers.%20Tell%20me%20about%20Roz%20Hisaab">Ask on WhatsApp</a></div>
+  <p class="code" id="codeLine" hidden>Your customer's invite code: <b id="code"></b></p>
+</div></header>
+
+<section class="wrap">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div><b>Add each customer once</b><p>Name, rate per litre or per month, and their WhatsApp number.</p></div>
+    <div><b>Mark Came or Missed every day</b><p>One tap per house. Change the quantity on days they take extra.</p></div>
+    <div><b>Send the bill on the 1st</b><p>The app adds up days, leaves and quantity. Send it on WhatsApp with your UPI ID.</p></div>
+    <div><b>Get paid straight to your bank</b><p>Customers pay on any UPI app. Roz Hisaab never touches your money.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:0">
+  <h2>The bill your customer gets</h2>
+  <div class="bill">*Doodh* bill for October 2026
+Days: 29
+Total litre: 44.5 × ₹64
+Missed: 2 days
+*Total: ₹2,848*
+UPI: yourname@upi</div>
+  <p style="color:var(--muted);font-size:16px">No more arguments about which day you came. Both of you see the same days.</p>
+</section>
+
+<section class="wrap" style="padding-top:0">
+  <h2>Free, in your language</h2>
+  <p>English, हिन्दी, ગુજરાતી, मराठी, বাংলা, தமிழ், తెలుగు, ಕನ್ನಡ, മലയാളം. Works without internet. Your data stays on your phone.</p>
+  <a class="cta" href="https://play.google.com/store/apps/details?id=in.rozhisaab.app" id="get2" style="background:var(--brand);color:#fff">Download Roz Hisaab</a>
+</section>
+
+<footer class="wrap">Roz Hisaab is operated by Singhani Wealth Management, Loharu, Bhiwani, Haryana · Udyam UDYAM-HR-02-0041040<br>WhatsApp <a href="https://wa.me/919625746088">+91 96257 46088</a> · <a href="mailto:support@rozhisaab.in">support@rozhisaab.in</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></footer>
+<script>
+(function(){var r=(new URLSearchParams(location.search).get('ref')||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,16);
+if(!r)return;var u='https://play.google.com/store/apps/details?id=in.rozhisaab.app&referrer='+encodeURIComponent('utm_source=vendor&utm_campaign='+r);
+document.getElementById('get').href=u;document.getElementById('get2').href=u;document.getElementById('code').textContent=r;document.getElementById('codeLine').hidden=false})();
+</script>
+</body>
+</html>
