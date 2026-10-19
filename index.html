@@ -26,6 +26,8 @@ h1 span{color:var(--gold)}
 .cta.alt{background:rgba(255,255,255,.14);color:#fff}
 .ctas{display:flex;gap:12px;flex-wrap:wrap}
 .langs{margin-top:20px;font-size:15px;opacity:.85}
+.invite{display:none;background:var(--gold);color:#1D1400;border-radius:16px;padding:14px 16px;margin-top:22px;font-size:16px;line-height:1.45}
+.invite b{font-family:"Baloo 2",sans-serif;font-size:22px;letter-spacing:1px;background:#fff;border-radius:8px;padding:0 8px}
 .phone{justify-self:center;width:min(300px,80vw);border-radius:40px;background:#0b1715;padding:12px;box-shadow:0 30px 70px rgba(0,0,0,.35);transform:rotate(3deg)}
 .phone img{width:100%;display:block;border-radius:30px}
 section{padding-block:64px}
@@ -61,7 +63,8 @@ footer h4{color:#fff;margin:0 0 8px;font-size:16px}
       <div>
         <h1>Your home's <span>daily accounts</span>, in one simple app.</h1>
         <p class="lead">Milk, maid, newspaper, rent, tuition fees and document renewals. Mark it in one tap and never argue over the monthly hisaab again.</p>
-        <div class="ctas" id="download"><a class="cta" href="https://play.google.com/store/apps/details?id=in.rozhisaab.app">Get it on Google Play</a><a class="cta alt" href="https://wa.me/919625746088?text=Hello%20Roz%20Hisaab">WhatsApp us</a></div>
+        <div class="invite" id="invite"></div>
+        <div class="ctas" id="download"><a class="cta" id="play" href="https://play.google.com/store/apps/details?id=in.rozhisaab.app">Get it on Google Play</a><a class="cta alt" href="https://wa.me/919625746088?text=Hello%20Roz%20Hisaab">WhatsApp us</a></div>
         <p class="langs">English · हिन्दी · ગુજરાતી · मराठी · বাংলা · தமிழ் · తెలుగు · ಕನ್ನಡ · മലയാളം</p>
       </div>
       <div class="phone"><img src="img/01-home.webp" alt="Roz Hisaab home screen showing this month's household bill, rent and fees"></div>
@@ -114,13 +117,19 @@ footer h4{color:#fff;margin:0 0 8px;font-size:16px}
 </section>
 
 <section class="wrap" style="padding-top:0">
+  <h2>For milkmen, maids, tutors and landlords</h2>
+  <p class="sub">Keep every customer's hisaab in one place. Mark daily entries, make the month's bill in one tap and send it on WhatsApp. Free.</p>
+  <div class="grid">
+    <div class="f"><b>Milk, water, newspaper</b><p>Add each home once. Mark deliveries every day and send bills at month end.</p></div>
+    <div class="f"><b>Home tutors and coaching</b><p>Daily attendance, fee status and reports for parents without a register.</p></div>
+    <div class="f"><b>Landlords</b><p>Rent status for every tenant, polite reminders and receipts on WhatsApp.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:0">
   <div class="f" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
     <div><b>Advertise on Roz Hisaab</b><p>Reach families, landlords and tutors in your city with a sponsored card.</p></div>
     <a class="cta" href="https://wa.me/919625746088?text=I%20want%20to%20advertise%20on%20Roz%20Hisaab">Ask for rates</a>
-  </div>
-  <div class="f" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-top:14px">
-    <div><b>Milkman, paperwala or tiffin service?</b><p>Keep every customer's daily hisaab free and send bills on WhatsApp.</p></div>
-    <a class="cta" href="vendor.html">See how</a>
   </div>
 </section>
 
@@ -131,5 +140,15 @@ footer h4{color:#fff;margin:0 0 8px;font-size:16px}
     <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms of Use</a></div>
   </div>
 </footer>
+<script>
+// Invite links look like rozhisaab.in/?r=ROZABC12. Show the code and pass it to Google Play.
+(function(){
+  var m=/[?&]r=(ROZ[A-Z0-9]{3,12})\b/i.exec(location.search);if(!m)return;var code=m[1].toUpperCase();
+  var box=document.getElementById('invite');box.style.display='block';
+  box.innerHTML='Your friend invited you. After installing, open <strong>Profile &gt; Invite and earn</strong> and enter <b>'+code+'</b>. You both get 1 month of Family Pro free.';
+  var a=document.getElementById('play');a.href+='&referrer='+encodeURIComponent('utm_source=invite&utm_campaign='+code);
+  try{navigator.clipboard&&navigator.clipboard.writeText(code)}catch(e){}
+})();
+</script>
 </body>
 </html>
