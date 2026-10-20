@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.rozhisaab.app",
+      "sha256_cert_fingerprints": [
+        "87:CC:48:99:5F:F6:41:C9:22:12:91:BC:F7:A9:F0:2B:87:23:F2:34:8C:4C:72:83:1D:57:E3:50:9D:89:83:3E"
+      ]
+    }
+  }
+]
