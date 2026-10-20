@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>List yourself free | Roz Hisaab Kaarigar</title>
+<meta name="description" content="Plumbers, electricians, carpenters, AC and RO technicians, painters and other kaarigars: list yourself free on Roz Hisaab and get calls from homes near you.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Hind:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F6F3EE;--ink:#1D2A28;--muted:#5E6B68;--brand:#14453D;--brand2:#1F6255;--gold:#F0B444;--card:#FFFFFF;--line:#E8E2D9;--ok:#1E7A4C;--bad:#B3261E;--field:#FBF9F6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101816;--ink:#E8EEEC;--muted:#9AA8A4;--card:#18221F;--line:#2A3633;--field:#1E2926;--ok:#5CC28C;--bad:#F08C84}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Hind,system-ui,sans-serif;font-size:17px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+header{background:linear-gradient(155deg,var(--brand2),var(--brand));color:#fff;padding-block:18px 56px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Baloo 2",sans-serif;font-weight:700;font-size:22px;text-decoration:none}
+.brand img{width:36px;height:36px;border-radius:10px}
+h1{font-family:"Baloo 2",sans-serif;font-weight:700;font-size:clamp(32px,7vw,48px);line-height:1.08;margin:30px 0 8px;text-wrap:balance}
+h1 span{color:var(--gold)}
+.hi{display:block;font-size:.62em;opacity:.9;margin-top:4px}
+.lead{font-size:18px;opacity:.92;margin:0;max-width:44ch}
+.points{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding:0;list-style:none}
+.points li{background:rgba(255,255,255,.14);border-radius:999px;padding:5px 12px;font-size:15px}
+main{margin-top:-32px;padding-bottom:48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:15px}
+label small{font-weight:400;color:var(--muted);font-size:14px}
+.full{grid-column:1/-1}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand2);outline-offset:1px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cats label{flex-direction:row;align-items:center;justify-content:center;text-align:center;gap:0;border:1px solid var(--line);border-radius:12px;padding:10px 6px;background:var(--field);font-size:14px;cursor:pointer;min-height:56px}
+.cats input{position:absolute;opacity:0;width:1px;height:1px}
+.cats label:has(input:checked){background:#DDF1EC;border-color:var(--brand2);color:#14453D}
+.row{display:flex;gap:8px;align-items:center}
+.loc{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;background:transparent;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.consent{flex-direction:row;align-items:flex-start;gap:10px;font-weight:400;font-size:15px}
+.consent input{width:22px;height:22px;flex:none;margin-top:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1D1400;font:inherit;font-weight:600;font-size:17px;padding:14px 22px;border-radius:14px;border:0;text-decoration:none;cursor:pointer;min-height:52px}
+.btn.alt{background:var(--brand2);color:#fff}
+.btn:disabled{opacity:.6}
+.msg{border-radius:12px;padding:10px 12px;font-size:15px;display:none}
+.msg.err{display:block;background:#FDECEA;color:#8C1D18}
+.ok{display:none;text-align:center}
+.ok .tick{width:64px;height:64px;border-radius:20px;background:#DDF1EC;color:var(--ok);display:grid;place-items:center;margin:0 auto 10px;font-size:34px}
+.ok h2{font-family:"Baloo 2",sans-serif;font-size:28px;margin:0}
+.chip{display:inline-block;background:#F2EFE9;color:#5E6B68;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:600;margin:8px 0}
+.btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.faq{margin-top:22px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-top:10px}
+.faq summary{font-weight:600;cursor:pointer}
+.faq p{margin:8px 0 0;color:var(--muted);font-size:16px}
+footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:center}
+@media (max-width:560px){form{grid-template-columns:1fr}.cats{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <nav><a class="brand" href="./"><img src="img/icon.png" alt="">Roz Hisaab</a></nav>
+    <h1>Get calls from <span>homes near you</span><span class="hi">अपने इलाके के घरों से काम पाएं</span></h1>
+    <p class="lead">Plumber, electrician, carpenter, AC or RO technician, painter? List yourself on Roz Hisaab. Families near you see your name and call you directly.</p>
+    <ul class="points"><li>Free listing · मुफ़्त</li><li>No commission · कोई कमीशन नहीं</li><li>Customers call you directly</li></ul>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <form id="f" novalidate>
+      <label class="full">Your name or business name <small>आपका नाम या दुकान का नाम</small><input id="name" required maxlength="60" autocomplete="name" placeholder="e.g. Ramesh Plumbing Works"></label>
+      <div class="full"><div style="font-weight:600;font-size:15px;margin-bottom:6px">Your work <small style="font-weight:400;color:var(--muted)">आपका काम</small></div>
+        <div class="cats" id="cats"></div></div>
+      <label>Mobile number <small>मोबाइल नंबर</small><input id="phone" required inputmode="tel" maxlength="17" autocomplete="tel" placeholder="10 digits"></label>
+      <label>WhatsApp number <small>अगर अलग है</small><input id="wa" inputmode="tel" maxlength="17" placeholder="Same as mobile"></label>
+      <label>City or town <small>शहर या कस्बा</small><input id="city" required maxlength="60" autocomplete="address-level2" placeholder="e.g. Bhiwani"></label>
+      <label>Pincode <small>पिनकोड</small><input id="pin" required inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="6 digits"></label>
+      <label class="full">Area or locality <small>इलाका, मोहल्ला</small><input id="area" maxlength="80" placeholder="e.g. Sector 4, Old Bus Stand"></label>
+      <div class="full row"><button type="button" class="loc" id="locBtn">📍 Add my shop location (optional) · लोकेशन जोड़ें</button><span id="locTxt" style="font-size:14px;color:var(--muted)"></span></div>
+      <label>Visit charge <small>विज़िट चार्ज</small><input id="charge" maxlength="40" placeholder="e.g. ₹200 visit"></label>
+      <label>Years of experience <small>कितने साल का अनुभव</small><input id="exp" type="number" min="0" max="60" inputmode="numeric" placeholder="e.g. 8"></label>
+      <label class="full">About your work (optional) <small>अपने काम के बारे में</small><textarea id="about" maxlength="200" placeholder="e.g. Bathroom fittings, motor repair, available on Sundays"></textarea></label>
+      <label class="consent full"><input type="checkbox" id="consent"><span>I agree that my name, work, area and phone number will be shown to people using the Roz Hisaab app near me, so they can call me. I can ask for my listing to be removed at any time. <a href="privacy.html">Privacy policy</a></span></label>
+      <div class="msg full" id="msg" role="alert"></div>
+      <button class="btn full" id="go" type="submit">List me free · मुफ़्त लिस्ट करें</button>
+    </form>
+
+    <div class="ok" id="ok">
+      <div class="tick">✓</div>
+      <h2>You are listed</h2>
+      <p style="margin:6px 0 0">आपकी लिस्टिंग चालू हो गई है।</p>
+      <span class="chip">Not verified yet</span>
+      <p style="margin:0;color:var(--muted)">Our team will call or WhatsApp you to verify your details. After that your listing shows a Verified badge.</p>
+      <div class="btns">
+        <a class="btn alt" id="share" target="_blank" rel="noopener">Tell your customers on WhatsApp</a>
+        <a class="btn" href="https://play.google.com/store/apps/details?id=in.rozhisaab.app">Get the Roz Hisaab app</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq">
+    <details><summary>Is it really free?</summary><p>Yes. Listing is free and there is no commission. Customers call or WhatsApp you directly and pay you directly.</p></details>
+    <details><summary>Who sees my number?</summary><p>Families using the Roz Hisaab app in your area, when they look for a kaarigar. Your number is not shown on this website.</p></details>
+    <details><summary>What does "Not verified yet" mean?</summary><p>Your listing is live, but our team has not checked it yet. We call or WhatsApp you to confirm your name, work and area. Then it shows a Verified badge.</p></details>
+    <details><summary>How do I change or remove my listing?</summary><p>Send us a WhatsApp message from the number you listed, and we will update or remove it.</p></details>
+  </div>
+</main>
+
+<footer class="wrap">Roz Hisaab is operated by Singhani Wealth Management · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="https://wa.me/919625746088?text=Kaarigar%20listing">WhatsApp us</a></footer>
+
+<script>
+/* Fill these two from the Supabase project (Settings > API). The anon key is public by design. */
+const SB_URL = 'https://bbuixnyompmraelkjlvr.supabase.co';
+const SB_KEY = 'REPLACE_WITH_SUPABASE_ANON_KEY';
+
+const CATS = [['plumber','Plumber','प्लंबर'],['electrician','Electrician','इलेक्ट्रीशियन'],['carpenter','Carpenter','बढ़ई'],['ac','AC repair','एसी रिपेयर'],['ro','RO and water','आरओ / पानी'],['appliance','Appliances','उपकरण रिपेयर'],['painter','Painter','पेंटर'],['pest','Pest control','पेस्ट कंट्रोल'],['mechanic','Mechanic','मैकेनिक'],['cleaning','Cleaning','सफ़ाई'],['other','Other','अन्य']];
+const $ = (id) => document.getElementById(id);
+$('cats').innerHTML = CATS.map(([k, en, hi]) => `<label><input type="radio" name="cat" value="${k}"><span>${en}<br><small style="font-weight:400">${hi}</small></span></label>`).join('');
+let loc = null;
+$('locBtn').onclick = () => {
+  if (!navigator.geolocation) { $('locTxt').textContent = 'Location is not available on this phone.'; return; }
+  $('locTxt').textContent = 'Finding your location…';
+  navigator.geolocation.getCurrentPosition(
+    (p) => { loc = { lat: +p.coords.latitude.toFixed(3), lng: +p.coords.longitude.toFixed(3) }; $('locTxt').textContent = 'Location added ✓'; },
+    () => { $('locTxt').textContent = 'Could not get location. Pincode is enough.'; },
+    { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 });
+};
+const fail = (t) => { const m = $('msg'); m.textContent = t; m.className = 'msg full err'; m.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+const digits = (x) => x.replace(/\D/g, '').slice(-10);
+$('f').onsubmit = async (e) => {
+  e.preventDefault(); $('msg').className = 'msg full';
+  const cat = (document.querySelector('input[name=cat]:checked') || {}).value;
+  const body = {
+    p_name: $('name').value.trim(), p_category: cat || '', p_phone: digits($('phone').value), p_whatsapp: digits($('wa').value),
+    p_city: $('city').value.trim(), p_area: $('area').value.trim(), p_pincode: $('pin').value.trim(),
+    p_lat: loc ? loc.lat : null, p_lng: loc ? loc.lng : null, p_charge: $('charge').value.trim(),
+    p_experience: $('exp').value === '' ? null : +$('exp').value, p_about: $('about').value.trim(), p_consent: $('consent').checked,
+  };
+  if (body.p_name.length < 2) return fail('Please enter your name or business name. / अपना नाम लिखें।');
+  if (!cat) return fail('Please choose your work. / अपना काम चुनें।');
+  if (!/^[6-9]\d{9}$/.test(body.p_phone)) return fail('Please enter a valid 10-digit mobile number. / सही मोबाइल नंबर लिखें।');
+  if (body.p_city.length < 2) return fail('Please enter your city or town. / शहर लिखें।');
+  if (!/^[1-9]\d{5}$/.test(body.p_pincode)) return fail('Please enter a valid 6-digit pincode. / सही पिनकोड लिखें।');
+  if (!body.p_consent) return fail('Please tick the box to agree. / सहमति के बॉक्स पर टिक करें।');
+  if (SB_URL.startsWith('REPLACE')) return fail('Registration opens soon. Please WhatsApp us for now.');
+  $('go').disabled = true; $('go').textContent = 'Listing you…';
+  try {
+    const r = await fetch(SB_URL.replace(/\/$/, '') + '/rest/v1/rpc/register_helper', {
+      method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || 'Something went wrong. Please try again.'); }
+    const text = `Namaste! I am now listed on Roz Hisaab as a ${CATS.find((c) => c[0] === cat)[1].toLowerCase()} in ${body.p_city}. Download the free app to find me and other trusted kaarigars near you: https://rozhisaab.in`;
+    $('share').href = 'https://wa.me/?text=' + encodeURIComponent(text);
+    $('f').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    fail(err.message);
+  } finally { $('go').disabled = false; $('go').textContent = 'List me free · मुफ़्त लिस्ट करें'; }
+};
+</script>
+</body>
+</html>
