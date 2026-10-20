@@ -145,7 +145,7 @@ footer h4{color:#fff;margin:0 0 8px;font-size:16px}
 (function(){
   var m=/[?&]r=(ROZ[A-Z0-9]{3,12})\b/i.exec(location.search);if(!m)return;var code=m[1].toUpperCase();
   var box=document.getElementById('invite');box.style.display='block';
-  box.innerHTML='Your friend invited you. After installing, open <strong>Profile &gt; Invite and earn</strong> and enter <b>'+code+'</b>. You both get 1 month of Family Pro free.';
+  box.innerHTML='Your friend invited you. Install Roz Hisaab from this page and the code <b>'+code+'</b> is added for you. If it is not, enter it in <strong>Profile &gt; Invite and earn</strong>. You both get 1 month of Family Pro free.';
   var a=document.getElementById('play');a.href+='&referrer='+encodeURIComponent('utm_source=invite&utm_campaign='+code);
   try{navigator.clipboard&&navigator.clipboard.writeText(code)}catch(e){}
 })();
