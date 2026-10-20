@@ -65,7 +65,7 @@ footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:cent
   <div class="wrap">
     <nav><a class="brand" href="./"><img src="img/icon.png" alt="">Roz Hisaab</a></nav>
     <h1>Get calls from <span>homes near you</span><span class="hi">अपने इलाके के घरों से काम पाएं</span></h1>
-    <p class="lead">Plumber, electrician, carpenter, AC or RO technician, painter? List yourself on Roz Hisaab. Families near you see your name and call you directly.</p>
+    <p class="lead">Plumber, electrician, carpenter, AC or RO technician, painter or home tutor? List yourself on Roz Hisaab. Families near you see your name and call you directly.</p>
     <ul class="points"><li>Free listing · मुफ़्त</li><li>No commission · कोई कमीशन नहीं</li><li>Customers call you directly</li></ul>
   </div>
 </header>
@@ -82,7 +82,7 @@ footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:cent
       <label>Pincode <small>पिनकोड</small><input id="pin" required inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="6 digits"></label>
       <label class="full">Area or locality <small>इलाका, मोहल्ला</small><input id="area" maxlength="80" placeholder="e.g. Sector 4, Old Bus Stand"></label>
       <div class="full row"><button type="button" class="loc" id="locBtn">📍 Add my shop location (optional) · लोकेशन जोड़ें</button><span id="locTxt" style="font-size:14px;color:var(--muted)"></span></div>
-      <label>Visit charge <small>विज़िट चार्ज</small><input id="charge" maxlength="40" placeholder="e.g. ₹200 visit"></label>
+      <label>Visit charge or monthly fee <small>विज़िट चार्ज या फीस</small><input id="charge" maxlength="40" placeholder="e.g. ₹200 visit"></label>
       <label>Years of experience <small>कितने साल का अनुभव</small><input id="exp" type="number" min="0" max="60" inputmode="numeric" placeholder="e.g. 8"></label>
       <label class="full">About your work (optional) <small>अपने काम के बारे में</small><textarea id="about" maxlength="200" placeholder="e.g. Bathroom fittings, motor repair, available on Sundays"></textarea></label>
       <label class="consent full"><input type="checkbox" id="consent"><span>I agree that my name, work, area and phone number will be shown to people using the Roz Hisaab app near me, so they can call me. I can ask for my listing to be removed at any time. <a href="privacy.html">Privacy policy</a></span></label>
@@ -118,10 +118,13 @@ footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:cent
 const SB_URL = 'https://bbuixnyompmraelkjlvr.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJidWl4bnlvbXBtcmFlbGtqbHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0Mzg0NjcsImV4cCI6MjEwODAxNDQ2N30.LeH8GJ6Nzku8CU3d3dQiQhoWDeBxAdIvPj8fFEDxSWg';
 
-const CATS = [['plumber','Plumber','प्लंबर'],['electrician','Electrician','इलेक्ट्रीशियन'],['carpenter','Carpenter','बढ़ई'],['ac','AC repair','एसी रिपेयर'],['ro','RO and water','आरओ / पानी'],['appliance','Appliances','उपकरण रिपेयर'],['painter','Painter','पेंटर'],['pest','Pest control','पेस्ट कंट्रोल'],['mechanic','Mechanic','मैकेनिक'],['cleaning','Cleaning','सफ़ाई'],['other','Other','अन्य']];
+const CATS = [['plumber','Plumber','प्लंबर'],['electrician','Electrician','इलेक्ट्रीशियन'],['carpenter','Carpenter','बढ़ई'],['ac','AC repair','एसी रिपेयर'],['ro','RO and water','आरओ / पानी'],['appliance','Appliances','उपकरण रिपेयर'],['painter','Painter','पेंटर'],['pest','Pest control','पेस्ट कंट्रोल'],['mechanic','Mechanic','मैकेनिक'],['cleaning','Cleaning','सफ़ाई'],['tutor','Home tutor','होम ट्यूटर'],['other','Other','अन्य']];
 const $ = (id) => document.getElementById(id);
 $('cats').innerHTML = CATS.map(([k, en, hi]) => `<label><input type="radio" name="cat" value="${k}"><span>${en}<br><small style="font-weight:400">${hi}</small></span></label>`).join('');
 let loc = null;
+{ const ty = new URLSearchParams(location.search).get('type'); const r = ty && document.querySelector('input[name=cat][value="' + ty.replace(/[^a-z]/g, '') + '"]'); if (r) r.checked = true; }
+const setAbout = () => { const c = (document.querySelector('input[name=cat]:checked') || {}).value; $('about').placeholder = c === 'tutor' ? 'e.g. Maths and Science, Class 6 to 10, home visits in the evening' : 'e.g. Bathroom fittings, motor repair, available on Sundays'; };
+$('cats').addEventListener('change', setAbout); setAbout();
 $('locBtn').onclick = () => {
   if (!navigator.geolocation) { $('locTxt').textContent = 'Location is not available on this phone.'; return; }
   $('locTxt').textContent = 'Finding your location…';
