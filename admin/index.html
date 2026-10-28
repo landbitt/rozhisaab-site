@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Roz Hisaab Admin</title>
+<link rel="icon" href="../img/icon.png">
+<style>
+:root{--bg:#F6F3EE;--ink:#1D2A28;--muted:#5E6B68;--brand:#14453D;--brand2:#1F6255;--gold:#F0B444;--card:#fff;--line:#E5DED3;--ok:#1E8E5A;--okS:#DDF1E6;--bad:#C0392B;--badS:#F9E1DE;--warn:#B7791F;--warnS:#FCEFD6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit}
+a{color:var(--brand2)}
+.top{background:var(--brand);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.top b{font-size:17px}.top img{width:30px;height:30px;border-radius:8px}
+.top .me{margin-left:auto;font-size:13px;opacity:.9}
+.tabs{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);padding:0 12px;position:sticky;top:54px;z-index:4}
+.tabs button{border:0;background:none;padding:12px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button[aria-pressed=true]{color:var(--brand);border-color:var(--gold)}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:18px}h3{margin:0 0 6px;font-size:15px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi span{display:block;color:var(--muted);font-size:12.5px}.kpi b{font-size:24px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;color:var(--ink);min-width:0}
+textarea{width:100%;min-height:70px}
+label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:13px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 13px;cursor:pointer;font-weight:600;color:var(--ink)}
+.btn.pri{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1d1400}
+.btn.bad{color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12.5px}
+tr.click{cursor:pointer}tr.click:hover{background:#FBF8F3}
+.chip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;background:#EEE;color:#444}
+.chip.ok{background:var(--okS);color:var(--ok)}.chip.bad{background:var(--badS);color:var(--bad)}.chip.warn{background:var(--warnS);color:var(--warn)}
+.muted{color:var(--muted)}.small{font-size:12.5px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px}
+.bars i{flex:1;background:var(--brand2);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.list>div{padding:8px 0;border-bottom:1px solid var(--line)}
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:20}
+.drawer.on{display:block}
+.drawer .in{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--bg);overflow:auto;padding:16px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1D2A28;color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:30;max-width:90vw}
+.login{max-width:380px;margin:12vh auto;padding:0 16px}
+.adprev{border-radius:14px;padding:14px;color:#fff;max-width:340px}
+.adprev b{display:block;font-size:16px}.adprev span{opacity:.9;font-size:13.5px}
+.adprev em{display:inline-block;margin-top:8px;background:rgba(255,255,255,.18);border-radius:8px;padding:3px 10px;font-style:normal;font-weight:600}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="drawer" id="drawer"><div class="in" id="drawerIn"></div></div>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* Same public project URL and anon key as kaarigar.html. Every admin action is checked on the server (app_admins). */
+const SB_URL = 'https://bbuixnyompmraelkjlvr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJidWl4bnlvbXBtcmFlbGtqbHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0Mzg0NjcsImV4cCI6MjEwODAxNDQ2N30.LeH8GJ6Nzku8CU3d3dQiQhoWDeBxAdIvPj8fFEDxSWg';
+const sb = supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, storageKey: 'rh_admin' } });
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const n0 = (x) => Number(x || 0).toLocaleString('en-IN');
+const dt = (x) => x ? new Date(x).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+const dtt = (x) => x ? new Date(x).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 3200); }
+async function rpc(fn, args) { const { data, error } = await sb.rpc(fn, args || {}); if (error) throw new Error(error.message); return data; }
+const ST = { me: null, tab: 'dash', days: 30, uq: '', lst: 'pending', lq: '', email: '', step: 'email' };
+const canEdit = () => ST.me && ST.me.role === 'admin';
+const W = () => canEdit() ? '' : 'disabled title="View-only admin"';
+const PLANS = { family: 'Family Pro', tutor: 'Tutor Pro', landlord: 'Landlord Pro' };
+const TABS = [['dash', 'Dashboard'], ['users', 'Users'], ['kaarigar', 'Kaarigar'], ['ads', 'Ad cards'], ['plans', 'Plans and settings'], ['admins', 'Admins and log']];
+const PLACES = ['home', 'ghar', 'kagaz', 'kiraya', 'tuition', 'kaarigar', 'all'];
+const LANGS = [['en', 'English'], ['hi', 'Hindi'], ['gu', 'Gujarati'], ['mr', 'Marathi'], ['bn', 'Bengali'], ['ta', 'Tamil'], ['te', 'Telugu'], ['kn', 'Kannada'], ['ml', 'Malayalam']];
+
+/* ---------- login ---------- */
+function loginView(msg) {
+  $('app').innerHTML = `<div class="login"><div class="card"><div class="row" style="margin-bottom:10px"><img src="../img/icon.png" style="width:36px;height:36px;border-radius:9px" alt=""><h2 style="margin:0">Roz Hisaab Admin</h2></div>
+  ${msg ? `<p class="chip bad" style="display:block;border-radius:10px;padding:8px 10px">${esc(msg)}</p>` : ''}
+  ${ST.step === 'code' ? `<form id="fCode"><p class="muted">We sent a 6-digit code to ${esc(ST.email)}.</p><label>Code<input id="code" inputmode="numeric" autocomplete="one-time-code" required></label>
+    <div class="row" style="margin-top:12px"><button class="btn pri" type="submit">Sign in</button><button class="btn" type="button" id="back">Change email</button></div></form>`
+  : `<form id="fEmail"><p class="muted">Only for the Roz Hisaab team. Use the email of an admin account.</p><label>Email<input id="email" type="email" required autocomplete="email" value="${esc(ST.email)}"></label>
+    <button class="btn pri" type="submit" style="margin-top:12px;width:100%">Send code</button></form>`}</div></div>`;
+  const fe = $('fEmail'), fc = $('fCode');
+  if (fe) fe.onsubmit = async (e) => { e.preventDefault(); ST.email = $('email').value.trim(); const { error } = await sb.auth.signInWithOtp({ email: ST.email, options: { shouldCreateUser: false } }); if (error) return loginView(error.message.includes('Signups') ? 'No account with this email. Sign in to the Roz Hisaab app once first.' : error.message); ST.step = 'code'; loginView(); };
+  if (fc) { fc.onsubmit = async (e) => { e.preventDefault(); const { error } = await sb.auth.verifyOtp({ email: ST.email, token: $('code').value.trim(), type: 'email' }); if (error) return loginView('That code is wrong or has expired.'); ST.step = 'email'; boot(); }; $('back').onclick = () => { ST.step = 'email'; loginView(); }; }
+}
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return loginView();
+  try { const r = await rpc('admin_me'); ST.me = r && r[0]; } catch (e) { ST.me = null; }
+  if (!ST.me) { await sb.auth.signOut(); return loginView('This account is not a Roz Hisaab admin.'); }
+  shell(); show(ST.tab);
+}
+function shell() {
+  $('app').innerHTML = `<div class="top"><img src="../img/icon.png" alt=""><b>Roz Hisaab Admin</b><span class="me">${esc(ST.me.email)} · ${ST.me.role === 'admin' ? 'Admin' : 'View only'} <button class="btn" id="out" style="margin-left:8px;padding:4px 10px">Sign out</button></span></div>
+  <div class="tabs">${TABS.map(([k, l]) => `<button data-tab="${k}">${l}</button>`).join('')}</div><main id="main"></main>`;
+  $('out').onclick = async () => { await sb.auth.signOut(); ST.me = null; loginView(); };
+  document.querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => show(b.dataset.tab));
+}
+async function show(t) {
+  ST.tab = t; document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.tab === t));
+  $('main').innerHTML = '<p class="muted">Loading…</p>';
+  try { await ({ dash, users, kaarigar, ads, plans, admins })[t](); } catch (e) { $('main').innerHTML = `<div class="card"><b>Could not load.</b><p class="muted">${esc(e.message)}</p></div>`; }
+}
+function drawer(html) { $('drawerIn').innerHTML = `<div class="row" style="justify-content:flex-end"><button class="btn" id="dClose">Close</button></div>` + html; $('drawer').classList.add('on'); $('dClose').onclick = closeDrawer; }
+function closeDrawer() { $('drawer').classList.remove('on'); }
+$('drawer').onclick = (e) => { if (e.target.id === 'drawer') closeDrawer(); };
+
+/* ---------- dashboard ---------- */
+async function dash() {
+  const s = await rpc('admin_stats', { days: ST.days });
+  const pro = s.pro_active || {}, proN = Object.values(pro).reduce((a, b) => a + b, 0);
+  const days = s.signups_by_day || [], max = Math.max(1, ...days.map((d) => d[1]));
+  const kv = (o) => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="row" style="justify-content:space-between"><span>${esc(k)}</span><b>${n0(v)}</b></div>`).join('') || '<p class="muted">None yet</p>';
+  $('main').innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Overview</h2><select id="days">${[7, 30, 90, 365].map((d) => `<option value="${d}" ${d === ST.days ? 'selected' : ''}>Last ${d} days</option>`).join('')}</select></div>
+  <div class="kpis">
+    <div class="kpi"><span>Signed-in users</span><b>${n0(s.users_total)}</b><span>+${n0(s.users_new)} in period</span></div>
+    <div class="kpi"><span>Guests (not signed in)</span><b>${n0(s.guests_total)}</b></div>
+    <div class="kpi"><span>Active homes</span><b>${n0(s.active_families)}</b><span>synced in period</span></div>
+    <div class="kpi"><span>Shared families</span><b>${n0(s.shared_families)}</b><span>2 or more members</span></div>
+    <div class="kpi"><span>Pro users</span><b>${n0(proN)}</b><span>${Object.entries(pro).map(([k, v]) => (PLANS[k] || k) + ' ' + v).join(' · ') || 'none'}</span></div>
+    <div class="kpi"><span>Referrals</span><b>${n0(s.referrals_total)}</b><span>+${n0(s.referrals_new)} in period</span></div>
+    <div class="kpi"><span>Kaarigars listed</span><b>${n0(s.kaarigar_total)}</b><span>${n0(s.kaarigar_verified)} verified · ${n0(s.kaarigar_pending)} waiting</span></div>
+    <div class="kpi"><span>Kaarigars reported</span><b style="color:${s.kaarigar_reported ? 'var(--bad)' : 'inherit'}">${n0(s.kaarigar_reported)}</b></div>
+  </div>
+  <div class="card"><h3>New sign-ups per day</h3>${days.length ? `<div class="bars">${days.map((d) => `<i style="height:${Math.round(d[1] * 100 / max)}%" title="${d[0]}: ${d[1]}"></i>`).join('')}</div><div class="row small muted" style="justify-content:space-between"><span>${esc(days[0][0])}</span><span>${esc(days[days.length - 1][0])}</span></div>` : '<p class="muted">No sign-ups in this period.</p>'}</div>
+  <div class="grid2">
+    <div class="card"><h3>Pro by source</h3>${kv(s.pro_by_source)}<p class="small muted">play = Google Play, trial = free trial, referral = invite rewards, manual = given here.</p></div>
+    <div class="card"><h3>Entries saved online</h3>${kv(s.records_by_type)}</div>
+    <div class="card"><h3>App language</h3>${kv(s.languages)}</div>
+    <div class="card"><h3>Top cities</h3>${(s.top_cities || []).map(([c, n]) => `<div class="row" style="justify-content:space-between"><span>${esc(c)}</span><b>${n0(n)}</b></div>`).join('') || '<p class="muted">None yet</p>'}</div>
+  </div>
+  <div class="card"><h3>Ad cards in period</h3><table><tr><th>Card</th><th>Advertiser</th><th>Shown</th><th>Taps</th><th>Tap rate</th></tr>${(s.ads || []).map((a) => `<tr><td>${esc(a.title)} ${a.active ? '' : '<span class="chip">off</span>'}</td><td>${esc(a.advertiser)}</td><td>${n0(a.impressions)}</td><td>${n0(a.clicks)}</td><td>${a.impressions ? (a.clicks * 100 / a.impressions).toFixed(1) + '%' : '-'}</td></tr>`).join('')}</table></div>
+  <div class="card"><h3>Waitlist</h3>${kv(s.waitlist)}</div>`;
+  $('days').onchange = (e) => { ST.days = +e.target.value; show('dash'); };
+}
+
+/* ---------- users ---------- */
+async function users() {
+  $('main').innerHTML = `<div class="card"><form id="fq" class="row"><input id="uq" placeholder="Search name, email, phone or referral code" value="${esc(ST.uq)}" style="flex:1"><button class="btn pri">Search</button></form></div><div class="card" id="ulist"><p class="muted">Loading…</p></div>`;
+  $('fq').onsubmit = (e) => { e.preventDefault(); ST.uq = $('uq').value.trim(); users(); };
+  const L = await rpc('admin_users', { q: ST.uq, lim: 100, off: 0 });
+  $('ulist').innerHTML = L.length ? `<table><tr><th>Name</th><th>Email</th><th class="hide-sm">Phone · City</th><th>Plan</th><th class="hide-sm">Family</th><th class="hide-sm">Joined</th></tr>
+  ${L.map((u) => `<tr class="click" data-u="${u.user_id}"><td>${esc(u.name || '-')} ${u.is_admin ? '<span class="chip warn">admin</span>' : ''}</td><td>${esc(u.email)}</td><td class="hide-sm">${esc(u.phone || '')} ${esc(u.city || '')}</td><td>${u.plans ? `<span class="chip ok">${esc(u.plans)}</span>` : '<span class="muted">Free</span>'}</td><td class="hide-sm">${u.family_size || 1}</td><td class="hide-sm">${dt(u.created_at)}</td></tr>`).join('')}</table>
+  <p class="small muted">Showing up to 100. Search to narrow down.</p>` : '<p class="muted">No users found.</p>';
+  document.querySelectorAll('tr[data-u]').forEach((r) => r.onclick = () => userDetail(L.find((u) => u.user_id === r.dataset.u)));
+}
+async function userDetail(u) {
+  drawer('<p class="muted">Loading…</p>');
+  const d = await rpc('admin_user_detail', { u: u.user_id });
+  drawer(`<div class="card"><h2>${esc(u.name || u.email)}</h2><div class="small muted">${esc(u.email)} · ${esc(u.phone || 'no phone')} · ${esc(u.city || 'no city')} · ${esc(u.language || 'en')}</div>
+    <div class="small muted">Joined ${dt(u.created_at)} · last sign-in ${dtt(u.last_sign_in) || '-'} · referral code ${esc(u.referral_code || '-')}${d.invited_by ? ' · invited by ' + esc(d.invited_by) : ''} · invited ${d.invited} friends</div></div>
+  <div class="card"><h3>Pro</h3>${d.subscriptions.length ? `<table><tr><th>Plan</th><th>Source</th><th>Until</th><th></th></tr>${d.subscriptions.map((s) => { const live = new Date(s.expires_at) > new Date(); return `<tr><td>${PLANS[s.plan] || s.plan}</td><td>${s.source}</td><td>${dt(s.expires_at)} ${live ? '<span class="chip ok">active</span>' : '<span class="chip">ended</span>'}</td><td>${live && s.source !== 'play' ? `<button class="btn bad" data-end="${s.id}" ${W()}>End now</button>` : ''}</td></tr>`; }).join('')}</table>` : '<p class="muted">No Pro yet.</p>'}
+    <form id="fGrant" class="row" style="margin-top:12px"><select id="gPlan">${Object.entries(PLANS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select><select id="gDays"><option value="14">14 days</option><option value="30" selected>1 month</option><option value="90">3 months</option><option value="365">1 year</option></select><input id="gNote" placeholder="Reason (for the log)" style="flex:1"><button class="btn gold" ${W()}>Give Pro</button></form>
+    <p class="small muted">Google Play subscriptions are refunded or cancelled in Play Console, not here.</p></div>
+  <div class="card"><h3>Families</h3>${d.families.map((f) => `<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span>${esc(f.name)} <span class="chip">${esc(f.role)}</span></span><span class="small muted">${f.members} members · ${n0(f.records)} entries · last change ${dtt(f.last_change) || '-'}</span></div>`).join('') || '<p class="muted">None</p>'}
+    <p class="small muted">Family entries are private. The panel shows counts only.</p></div>
+  ${d.waitlist.length ? `<div class="card"><h3>Waiting for</h3>${d.waitlist.map(esc).join(', ')}</div>` : ''}`);
+  $('fGrant').onsubmit = async (e) => { e.preventDefault(); try { const ex = await rpc('admin_grant_pro', { u: u.user_id, p_plan: $('gPlan').value, p_days: +$('gDays').value, p_note: $('gNote').value }); toast('Pro given until ' + dt(ex)); userDetail(u); } catch (er) { toast(er.message); } };
+  document.querySelectorAll('[data-end]').forEach((b) => b.onclick = async () => { if (!confirm('End this Pro now?')) return; try { await rpc('admin_end_pro', { sub: b.dataset.end, p_note: '' }); toast('Ended'); userDetail(u); } catch (er) { toast(er.message); } });
+}
+
+/* ---------- kaarigar ---------- */
+async function kaarigar() {
+  const tabs = [['pending', 'Waiting to verify'], ['reported', 'Reported'], ['verified', 'Verified'], ['hidden', 'Hidden'], ['all', 'All']];
+  $('main').innerHTML = `<div class="card"><div class="row">${tabs.map(([k, l]) => `<button class="btn ${ST.lst === k ? 'pri' : ''}" data-ls="${k}">${l}</button>`).join('')}</div>
+    <form id="flq" class="row" style="margin-top:10px"><input id="lq" placeholder="Search name, phone, city, pincode or trade" value="${esc(ST.lq)}" style="flex:1"><button class="btn">Search</button></form></div><div id="llist"><p class="muted">Loading…</p></div>`;
+  document.querySelectorAll('[data-ls]').forEach((b) => b.onclick = () => { ST.lst = b.dataset.ls; kaarigar(); });
+  $('flq').onsubmit = (e) => { e.preventDefault(); ST.lq = $('lq').value.trim(); kaarigar(); };
+  const L = await rpc('admin_listings', { p_status: ST.lst, q: ST.lq, lim: 200 });
+  $('llist').innerHTML = L.length ? L.map((l) => `<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">${esc(l.name)} <span class="chip">${esc(l.category)}</span> ${l.verified ? '<span class="chip ok">verified</span>' : '<span class="chip warn">not verified</span>'} ${l.active ? '' : '<span class="chip bad">hidden</span>'} ${l.reports ? `<span class="chip bad">${l.reports} reports</span>` : ''}</h3>
+      <div class="small muted">${esc(l.area)} ${esc(l.city)} ${esc(l.pincode)} · ${l.experience != null ? l.experience + ' yrs · ' : ''}${esc(l.charge_note)} · added ${dt(l.created_at)} via ${esc(l.source)}${l.listed_until ? ' · listed until ' + dt(l.listed_until) : ''}</div>
+      ${l.about ? `<div class="small">${esc(l.about)}</div>` : ''}</div>
+      <div class="row"><a class="btn" href="tel:+91${esc(l.phone)}">Call ${esc(l.phone)}</a>${l.whatsapp || l.phone ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/91${esc(l.whatsapp || l.phone)}">WhatsApp</a>` : ''}</div></div>
+    <div class="row" style="margin-top:10px">${l.verified ? `<button class="btn" data-la="unverify" data-id="${l.id}" ${W()}>Remove verified</button>` : `<button class="btn pri" data-la="verify" data-id="${l.id}" ${W()}>Verify</button>`}
+      ${l.active ? `<button class="btn bad" data-la="hide" data-id="${l.id}" ${W()}>Hide</button>` : `<button class="btn" data-la="show" data-id="${l.id}" ${W()}>Show again</button>`}
+      ${l.reports ? `<button class="btn" data-rep="${l.id}">See reports</button><button class="btn" data-la="clear_reports" data-id="${l.id}" ${W()}>Clear reports</button>` : ''}
+      <select data-ext="${l.id}" ${W()}><option value="">Extend listing…</option><option value="30">+30 days</option><option value="90">+90 days</option><option value="365">+1 year</option></select></div></div>`).join('') : '<div class="card"><p class="muted">Nothing here.</p></div>';
+  document.querySelectorAll('[data-la]').forEach((b) => b.onclick = async () => { try { await rpc('admin_listing_action', { p_id: b.dataset.id, p_action: b.dataset.la, p_days: 0, p_note: '' }); toast('Done'); kaarigar(); } catch (e) { toast(e.message); } });
+  document.querySelectorAll('[data-ext]').forEach((s) => s.onchange = async () => { if (!s.value) return; try { await rpc('admin_listing_action', { p_id: s.dataset.ext, p_action: 'extend', p_days: +s.value, p_note: '' }); toast('Listing extended'); kaarigar(); } catch (e) { toast(e.message); } });
+  document.querySelectorAll('[data-rep]').forEach((b) => b.onclick = async () => { const R = await rpc('admin_listing_reports', { p_id: b.dataset.rep }); drawer(`<div class="card"><h2>Reports</h2>${R.map((r) => `<div class="list"><div><b>${esc(r.reason || 'No reason given')}</b><div class="small muted">${dtt(r.created_at)}</div></div></div>`).join('') || '<p class="muted">None</p>'}</div>`); });
+}
+
+/* ---------- ad cards ---------- */
+async function ads() {
+  const L = await rpc('admin_ads');
+  $('main').innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Sponsored cards</h2><button class="btn gold" id="newAd" ${W()}>New card</button></div>
+  ${L.map((a) => `<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3 style="margin:0">${esc(a.title)} ${a.active ? '<span class="chip ok">on</span>' : '<span class="chip">off</span>'}</h3>
+    <div class="small muted">${esc(a.id)} · ${esc(a.advertiser)} · tabs: ${esc((a.placement || []).join(', '))} · cities: ${esc((a.cities || []).join(', ') || 'all India')} · languages: ${esc((a.languages || []).join(', ') || 'all')} · weight ${a.weight}${a.ends_at ? ' · ends ' + dt(a.ends_at) : ''}</div>
+    ${a.rate_note ? `<div class="small">Rate: ${esc(a.rate_note)}</div>` : ''}</div>
+    <div class="row"><button class="btn" data-stats="${esc(a.id)}">Stats</button><button class="btn" data-edit="${esc(a.id)}" ${W()}>Edit</button><button class="btn" data-tog="${esc(a.id)}" ${W()}>${a.active ? 'Turn off' : 'Turn on'}</button></div></div></div>`).join('')}`;
+  $('newAd').onclick = () => adForm({ id: '', advertiser: '', title: '', body: '', cta: 'Learn more', url: 'https://', icon: 'star', color: '#14453D', placement: ['home'], cities: [], languages: [], weight: 1, active: true, rate_note: '' });
+  document.querySelectorAll('[data-edit]').forEach((b) => b.onclick = () => adForm(L.find((a) => a.id === b.dataset.edit)));
+  document.querySelectorAll('[data-tog]').forEach((b) => b.onclick = async () => { const a = L.find((x) => x.id === b.dataset.tog); try { await rpc('admin_save_ad', { a: { ...a, active: !a.active } }); toast(a.active ? 'Turned off' : 'Turned on'); ads(); } catch (e) { toast(e.message); } });
+  document.querySelectorAll('[data-stats]').forEach((b) => b.onclick = async () => { const D = await rpc('admin_ad_daily', { p_id: b.dataset.stats, days: 30 }); const im = D.reduce((x, d) => x + +d.impressions, 0), cl = D.reduce((x, d) => x + +d.clicks, 0);
+    drawer(`<div class="card"><h2>${esc(b.dataset.stats)}: last 30 days</h2><p>Shown <b>${n0(im)}</b> · taps <b>${n0(cl)}</b> · tap rate <b>${im ? (cl * 100 / im).toFixed(1) + '%' : '-'}</b></p><table><tr><th>Day</th><th>Shown</th><th>Taps</th></tr>${D.map((d) => `<tr><td>${esc(d.day)}</td><td>${n0(d.impressions)}</td><td>${n0(d.clicks)}</td></tr>`).join('')}</table><p class="small muted">Use these numbers when you report to the advertiser.</p></div>`); });
+}
+function adForm(a) {
+  const isNew = !a.id;
+  drawer(`<form id="fAd" class="card" style="display:grid;gap:10px"><h2>${isNew ? 'New card' : 'Edit card'}</h2>
+  <label>ID (short, small letters and -)<input id="aId" value="${esc(a.id)}" ${isNew ? '' : 'readonly'} placeholder="e.g. sharma-dairy-bhiwani" required></label>
+  <label>Advertiser<input id="aAdv" value="${esc(a.advertiser)}" required></label>
+  <label>Title<input id="aTitle" value="${esc(a.title)}" maxlength="60" required></label>
+  <label>Text<textarea id="aBody" maxlength="160" required>${esc(a.body)}</textarea></label>
+  <div class="grid2"><label>Button text<input id="aCta" value="${esc(a.cta)}" maxlength="22"></label><label>Link (https://)<input id="aUrl" value="${esc(a.url)}" required></label>
+  <label>Icon<select id="aIcon">${['star', 'house', 'land', 'shield', 'milk', 'edu', 'car', 'health', 'wrench', 'cart'].map((i) => `<option ${i === a.icon ? 'selected' : ''}>${i}</option>`).join('')}</select></label><label>Colour<input id="aColor" type="color" value="${esc(a.color || '#14453D')}"></label></div>
+  <div><b class="small">Show on tabs</b><div class="row">${PLACES.map((p) => `<label style="flex-direction:row;font-weight:500"><input type="checkbox" class="aPl" value="${p}" ${(a.placement || []).includes(p) ? 'checked' : ''}> ${p}</label>`).join('')}</div></div>
+  <label>Cities (comma separated, empty = all India)<input id="aCities" value="${esc((a.cities || []).join(', '))}" placeholder="e.g. Bhiwani, Loharu"></label>
+  <div><b class="small">Languages (none ticked = every language)</b><div class="row">${LANGS.map(([c, l]) => `<label style="flex-direction:row;font-weight:500"><input type="checkbox" class="aLg" value="${c}" ${(a.languages || []).includes(c) ? 'checked' : ''}> ${l}</label>`).join('')}</div></div>
+  <div class="grid2"><label>Starts<input id="aStart" type="date" value="${a.starts_at ? a.starts_at.slice(0, 10) : ''}"></label><label>Ends (optional)<input id="aEnd" type="date" value="${a.ends_at ? a.ends_at.slice(0, 10) : ''}"></label>
+  <label>Weight (1 to 100, higher shows more often)<input id="aW" type="number" min="1" max="100" value="${a.weight || 1}"></label><label>Rate agreed (internal)<input id="aRate" value="${esc(a.rate_note || '')}" placeholder="e.g. ₹3,000 per month"></label></div>
+  <label style="flex-direction:row;font-weight:500"><input type="checkbox" id="aOn" ${a.active ? 'checked' : ''}> Card is on</label>
+  <div><b class="small">Preview</b><div class="adprev" id="aPrev"></div></div>
+  <p class="small muted">Landbitt cards: no return or profit claims, no urgency, SPV and profit rights only for fractional, and the minimum always as "1 sq. ft. or ₹20,000, whichever is higher".</p>
+  <div class="row"><button class="btn pri" type="submit">Save card</button></div></form>`);
+  const prev = () => { $('aPrev').style.background = $('aColor').value; $('aPrev').innerHTML = `<b>${esc($('aTitle').value)}</b><span>${esc($('aBody').value)}</span><br><em>${esc($('aCta').value || 'Learn more')}</em> <span class="small">Sponsored · ${esc($('aAdv').value)}</span>`; };
+  ['aTitle', 'aBody', 'aCta', 'aAdv', 'aColor'].forEach((i) => $(i).oninput = prev); prev();
+  $('fAd').onsubmit = async (e) => { e.preventDefault();
+    const pl = [...document.querySelectorAll('.aPl:checked')].map((x) => x.value), lg = [...document.querySelectorAll('.aLg:checked')].map((x) => x.value);
+    const body = { id: $('aId').value.trim(), advertiser: $('aAdv').value, title: $('aTitle').value, body: $('aBody').value, cta: $('aCta').value, url: $('aUrl').value.trim(), icon: $('aIcon').value, color: $('aColor').value,
+      placement: pl.length ? pl : ['home'], cities: $('aCities').value.split(',').map((x) => x.trim()).filter(Boolean), languages: lg,
+      starts_at: $('aStart').value ? $('aStart').value + 'T00:00:00+05:30' : '', ends_at: $('aEnd').value ? $('aEnd').value + 'T23:59:59+05:30' : '', weight: +$('aW').value || 1, active: $('aOn').checked, rate_note: $('aRate').value };
+    try { await rpc('admin_save_ad', { a: body }); toast('Card saved. The app shows it on next open.'); closeDrawer(); ads(); } catch (er) { toast(er.message); } };
+}
+
+/* ---------- plans and settings ---------- */
+async function plans() {
+  const s = await rpc('admin_settings');
+  const tog = (k, l, d) => `<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0"><div><b>${l}</b><div class="small muted">${d}</div></div><button class="btn ${s[k] ? 'pri' : ''}" data-set="${k}" data-v="${!s[k]}" ${W()}>${s[k] ? 'On' : 'Off'}</button></div>`;
+  $('main').innerHTML = `<div class="card"><h2>Launch switches</h2>
+    ${tog('early_access_pro', 'Pro free for everyone', 'Every signed-in user gets all Pro features. Use only for a launch offer.')}
+    ${tog('early_trials_open', '14-day free trial', 'New users can start the 14-day trial of any Pro plan.')}
+    <form id="fVer" class="row" style="padding-top:10px"><label style="flex:1">Lowest app version allowed<input id="ver" value="${esc(s.min_app_version)}" placeholder="1.0.0"></label><button class="btn" ${W()}>Save</button></form>
+    <p class="small muted">Older app versions are asked to update. Last changed ${dtt(s.updated_at)}.</p></div>
+  <div class="card"><h2>Plans and prices</h2><table><tr><th>Plan</th><th>Monthly</th><th>Yearly</th><th>What it adds</th></tr>
+    <tr><td>Family Pro</td><td>₹29</td><td>₹249</td><td class="small">Document photos, HRA receipts, nearby kaarigars, budgets, reports, cloud sync and family sharing, no ads</td></tr>
+    <tr><td>Tutor Pro</td><td>₹99</td><td>₹999</td><td class="small">Fee receipts, parent reports, remind all parents</td></tr>
+    <tr><td>Landlord Pro</td><td>₹99</td><td>₹999</td><td class="small">Rent receipts, meter bill, rent agreement with renewal alerts, remind all tenants</td></tr></table>
+    <p class="small muted">Prices people pay are set in Google Play Console (Monetize > Subscriptions) and App Store Connect. The app reads them from the store. To give or end Pro for one person, use Users.</p></div>`;
+  document.querySelectorAll('[data-set]').forEach((b) => b.onclick = async () => { if (b.dataset.set === 'early_access_pro' && b.dataset.v === 'true' && !confirm('Give every user all Pro features for free?')) return; try { await rpc('admin_set_setting', { p_key: b.dataset.set, p_value: b.dataset.v }); toast('Saved'); plans(); } catch (e) { toast(e.message); } });
+  $('fVer').onsubmit = async (e) => { e.preventDefault(); try { await rpc('admin_set_setting', { p_key: 'min_app_version', p_value: $('ver').value.trim() }); toast('Saved'); plans(); } catch (er) { toast(er.message); } };
+}
+
+/* ---------- admins and log ---------- */
+async function admins() {
+  const [A, Lg] = await Promise.all([rpc('admin_admins'), rpc('admin_log_list', { lim: 200 })]);
+  $('main').innerHTML = `<div class="card"><h2>Team</h2><table><tr><th>Email</th><th>Access</th><th>Since</th><th></th></tr>${A.map((a) => `<tr><td>${esc(a.email)}</td><td>${a.role === 'admin' ? 'Admin' : 'View only'}</td><td>${dt(a.added_at)}</td><td>${a.email !== ST.me.email ? `<button class="btn bad" data-rm="${esc(a.email)}" ${W()}>Remove</button>` : ''}</td></tr>`).join('')}</table>
+    <form id="fAdm" class="row" style="margin-top:12px"><input id="admEmail" type="email" placeholder="Their email (they must have signed in to the app once)" style="flex:1" required><select id="admRole"><option value="viewer">View only</option><option value="admin">Admin</option></select><button class="btn gold" ${W()}>Add</button></form></div>
+  <div class="card"><h2>Activity log</h2>${Lg.length ? `<table><tr><th>When</th><th>Who</th><th>What</th><th class="hide-sm">Details</th></tr>${Lg.map((l) => `<tr><td>${dtt(l.at)}</td><td class="small">${esc(l.admin_email)}</td><td>${esc(l.action.replace(/_/g, ' '))} <span class="small muted">${esc(String(l.target).slice(0, 40))}</span></td><td class="hide-sm small muted">${esc(JSON.stringify(l.detail)).slice(0, 120)}</td></tr>`).join('')}</table>` : '<p class="muted">Nothing yet.</p>'}</div>`;
+  $('fAdm').onsubmit = async (e) => { e.preventDefault(); try { await rpc('admin_set_admin', { p_email: $('admEmail').value, p_role: $('admRole').value }); toast('Added'); admins(); } catch (er) { toast(er.message); } };
+  document.querySelectorAll('[data-rm]').forEach((b) => b.onclick = async () => { if (!confirm('Remove ' + b.dataset.rm + ' from the team?')) return; try { await rpc('admin_set_admin', { p_email: b.dataset.rm, p_role: 'none' }); toast('Removed'); admins(); } catch (er) { toast(er.message); } });
+}
+
+boot();
+</script>
+</body>
+</html>
