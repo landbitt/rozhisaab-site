@@ -233,20 +233,36 @@ function adForm(a) {
 
 /* ---------- plans and settings ---------- */
 async function plans() {
-  const s = await rpc('admin_settings');
+  const [s, P] = await Promise.all([rpc('admin_settings'), rpc('admin_plans').catch(() => null)]);
   const tog = (k, l, d) => `<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0"><div><b>${l}</b><div class="small muted">${d}</div></div><button class="btn ${s[k] ? 'pri' : ''}" data-set="${k}" data-v="${!s[k]}" ${W()}>${s[k] ? 'On' : 'Off'}</button></div>`;
   $('main').innerHTML = `<div class="card"><h2>Launch switches</h2>
     ${tog('early_access_pro', 'Pro free for everyone', 'Every signed-in user gets all Pro features. Use only for a launch offer.')}
-    ${tog('early_trials_open', '14-day free trial', 'New users can start the 14-day trial of any Pro plan.')}
+    ${tog('early_trials_open', 'Free trial in the app', 'New users can start a free trial of any Pro plan.')}
+    <form id="fTrial" class="row" style="padding-top:10px"><label style="flex:1">Free trial length (days, 3 to 30)<input id="tdays" type="number" min="3" max="30" value="${esc(s.trial_days || 14)}"></label><button class="btn" ${W()}>Save</button></form>
+    <p class="small muted">Used by the in-app trial and every "free for N days" text in the app. For Google Play and App Store trials, set the same length on the free-trial offer in Play Console and App Store Connect.</p>
     <form id="fVer" class="row" style="padding-top:10px"><label style="flex:1">Lowest app version allowed<input id="ver" value="${esc(s.min_app_version)}" placeholder="1.0.0"></label><button class="btn" ${W()}>Save</button></form>
     <p class="small muted">Older app versions are asked to update. Last changed ${dtt(s.updated_at)}.</p></div>
-  <div class="card"><h2>Plans and prices</h2><table><tr><th>Plan</th><th>Monthly</th><th>Yearly</th><th>What it adds</th></tr>
-    <tr><td>Family Pro</td><td>₹29</td><td>₹249</td><td class="small">Document photos, HRA receipts, nearby kaarigars, budgets, reports, cloud sync and family sharing, no ads</td></tr>
-    <tr><td>Tutor Pro</td><td>₹99</td><td>₹999</td><td class="small">Fee receipts, parent reports, remind all parents</td></tr>
-    <tr><td>Landlord Pro</td><td>₹99</td><td>₹999</td><td class="small">Rent receipts, meter bill, rent agreement with renewal alerts, remind all tenants</td></tr></table>
-    <p class="small muted">Prices people pay are set in Google Play Console (Monetize > Subscriptions) and App Store Connect. The app reads them from the store. To give or end Pro for one person, use Users.</p></div>`;
+  ${P ? P.map((p) => `<form class="card" data-plan="${p.plan}" style="display:grid;gap:10px">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(p.title)}</h2><label style="flex-direction:row;font-weight:600;gap:6px"><input type="checkbox" name="enabled" ${p.enabled ? 'checked' : ''}> Offered in the app</label></div>
+    <div class="grid2"><label>Plan name<input name="title" value="${esc(p.title)}" maxlength="30" required></label><label>Line under the price<input name="tagline" value="${esc(p.tagline)}" maxlength="60"></label>
+    <label>Price shown, per month (₹)<input name="price_month" type="number" min="0" value="${p.price_month}" required></label><label>Price shown, per year (₹)<input name="price_year" type="number" min="0" value="${p.price_year}" required></label></div>
+    <label>Features (one per line, up to 12)<textarea name="features" rows="7">${esc((p.features || []).join('\n'))}</textarea></label>
+    <label>Offer note (internal, not shown in the app)<input name="offer_note" value="${esc(p.offer_note || '')}" placeholder="e.g. Diwali intro offer ₹9 first month, live in Play Console till 15 Nov"></label>
+    <div class="row" style="justify-content:space-between"><span class="small muted">Last changed ${dtt(p.updated_at)}</span><button class="btn pri" ${W()}>Save ${esc(p.title)}</button></div></form>`).join('')
+    : `<div class="card"><h2>Plans</h2><p class="muted">Plan editing needs the database update 0015_plan_config.sql. Ask the team to run it.</p></div>`}
+  <div class="card"><h2>What people actually pay</h2>
+    <p class="small">The amount charged is set in the stores, not here. When you change a price above, change it there too, on the same day:</p>
+    <div class="row"><a class="btn" target="_blank" rel="noopener" href="https://play.google.com/console">Google Play Console</a><a class="btn" target="_blank" rel="noopener" href="https://appstoreconnect.apple.com">App Store Connect</a></div>
+    <p class="small muted">Play Console: Roz Hisaab > Monetize with Play > Products > Subscriptions > family_pro, tutor_pro or landlord_pro > base plans (monthly, yearly) and offers (free trial, intro price, promo codes). The app shows the store price when the store loads; the price above is shown before that and on the website.</p>
+    <p class="small muted">New text shows in English in other app languages until it is translated in the next app update. "Offered in the app" off hides the plan from new buyers; people who already have it keep it.</p></div>`;
   document.querySelectorAll('[data-set]').forEach((b) => b.onclick = async () => { if (b.dataset.set === 'early_access_pro' && b.dataset.v === 'true' && !confirm('Give every user all Pro features for free?')) return; try { await rpc('admin_set_setting', { p_key: b.dataset.set, p_value: b.dataset.v }); toast('Saved'); plans(); } catch (e) { toast(e.message); } });
   $('fVer').onsubmit = async (e) => { e.preventDefault(); try { await rpc('admin_set_setting', { p_key: 'min_app_version', p_value: $('ver').value.trim() }); toast('Saved'); plans(); } catch (er) { toast(er.message); } };
+  $('fTrial').onsubmit = async (e) => { e.preventDefault(); try { await rpc('admin_set_setting', { p_key: 'trial_days', p_value: String(+$('tdays').value) }); toast('Trial length saved'); plans(); } catch (er) { toast(er.message); } };
+  document.querySelectorAll('form[data-plan]').forEach((f) => f.onsubmit = async (e) => { e.preventDefault(); const g = (n) => f.elements[n];
+    const body = { plan: f.dataset.plan, enabled: g('enabled').checked, title: g('title').value, tagline: g('tagline').value, price_month: +g('price_month').value, price_year: +g('price_year').value,
+      features: g('features').value.split('\n').map((x) => x.trim()).filter(Boolean), offer_note: g('offer_note').value };
+    if (!body.enabled && !confirm('Hide ' + body.title + ' from new buyers?')) return;
+    try { await rpc('admin_save_plan', { p: body }); toast(body.title + ' saved. The app and website show it on next open.'); plans(); } catch (er) { toast(er.message); } });
 }
 
 /* ---------- admins and log ---------- */
