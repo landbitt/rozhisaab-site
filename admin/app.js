@@ -16,7 +16,7 @@ const canEdit = () => ST.me && ST.me.role === 'admin';
 const W = () => canEdit() ? '' : 'disabled title="View-only admin"';
 const PLANS = { family: 'Family Pro', tutor: 'Tutor Pro', landlord: 'Landlord Pro' };
 const TABS = [['dash', 'Dashboard'], ['users', 'Users'], ['kaarigar', 'Kaarigar'], ['ads', 'Ad cards'], ['plans', 'Plans and settings'], ['admins', 'Admins and log']];
-const PLACES = ['home', 'ghar', 'kagaz', 'kiraya', 'tuition', 'kaarigar', 'all'];
+const PLACES = ['home', 'ghar', 'kagaz', 'kiraya', 'tuition', 'kaarigar', 'pdf', 'all'];
 const LANGS = [['en', 'English'], ['hi', 'Hindi'], ['gu', 'Gujarati'], ['mr', 'Marathi'], ['bn', 'Bengali'], ['ta', 'Tamil'], ['te', 'Telugu'], ['kn', 'Kannada'], ['ml', 'Malayalam']];
 
 /* ---------- login ---------- */
@@ -151,7 +151,7 @@ function adForm(a) {
   <label>Text<textarea id="aBody" maxlength="160" required>${esc(a.body)}</textarea></label>
   <div class="grid2"><label>Button text<input id="aCta" value="${esc(a.cta)}" maxlength="22"></label><label>Link (https://)<input id="aUrl" value="${esc(a.url)}" required></label>
   <label>Icon<select id="aIcon">${['star', 'house', 'land', 'shield', 'milk', 'edu', 'car', 'health', 'wrench', 'cart'].map((i) => `<option ${i === a.icon ? 'selected' : ''}>${i}</option>`).join('')}</select></label><label>Colour<input id="aColor" type="color" value="${esc(a.color || '#14453D')}"></label></div>
-  <div><b class="small">Show on tabs</b><div class="row">${PLACES.map((p) => `<label style="flex-direction:row;font-weight:500"><input type="checkbox" class="aPl" value="${p}" ${(a.placement || []).includes(p) ? 'checked' : ''}> ${p}</label>`).join('')}</div></div>
+  <div><b class="small">Show on tabs <span class="muted">(pdf: a card at the end of free-plan PDFs, only if ticked here)</span></b><div class="row">${PLACES.map((p) => `<label style="flex-direction:row;font-weight:500"><input type="checkbox" class="aPl" value="${p}" ${(a.placement || []).includes(p) ? 'checked' : ''}> ${p}</label>`).join('')}</div></div>
   <label>Cities (comma separated, empty = all India)<input id="aCities" value="${esc((a.cities || []).join(', '))}" placeholder="e.g. Bhiwani, Loharu"></label>
   <div><b class="small">Languages (none ticked = every language)</b><div class="row">${LANGS.map(([c, l]) => `<label style="flex-direction:row;font-weight:500"><input type="checkbox" class="aLg" value="${c}" ${(a.languages || []).includes(c) ? 'checked' : ''}> ${l}</label>`).join('')}</div></div>
   <div class="grid2"><label>Starts<input id="aStart" type="date" value="${a.starts_at ? esc(a.starts_at.slice(0, 10)) : ''}"></label><label>Ends (optional)<input id="aEnd" type="date" value="${a.ends_at ? esc(a.ends_at.slice(0, 10)) : ''}"></label>
