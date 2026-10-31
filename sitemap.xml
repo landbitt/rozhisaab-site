@@ -4,4 +4,5 @@
   <url><loc>https://rozhisaab.in/kaarigar.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://rozhisaab.in/privacy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://rozhisaab.in/terms.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://rozhisaab.in/delete-account.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
