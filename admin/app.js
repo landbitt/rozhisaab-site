@@ -56,6 +56,7 @@ $('drawer').onclick = (e) => { if (e.target.id === 'drawer') closeDrawer(); };
 /* ---------- dashboard ---------- */
 async function dash() {
   const s = await rpc('admin_stats', { days: ST.days });
+  let u = null; try { u = await rpc('admin_usage', { days: Math.min(ST.days, 180) }); } catch (e) { u = null; }
   const pro = s.pro_active || {}, proN = Object.values(pro).reduce((a, b) => a + b, 0);
   const days = s.signups_by_day || [], max = Math.max(1, ...days.map((d) => d[1]));
   const kv = (o) => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="row" style="justify-content:space-between"><span>${esc(k)}</span><b>${n0(v)}</b></div>`).join('') || '<p class="muted">None yet</p>';
@@ -70,6 +71,7 @@ async function dash() {
     <div class="kpi"><span>Kaarigars listed</span><b>${n0(s.kaarigar_total)}</b><span>${n0(s.kaarigar_verified)} verified · ${n0(s.kaarigar_pending)} waiting</span></div>
     <div class="kpi"><span>Kaarigars reported</span><b style="color:${s.kaarigar_reported ? 'var(--bad)' : 'inherit'}">${n0(s.kaarigar_reported)}</b></div>
   </div>
+  ${usageCard(u)}
   <div class="card"><h3>New sign-ups per day</h3>${days.length ? `<div class="bars">${days.map((d) => `<i style="height:${Math.round(d[1] * 100 / max)}%" title="${esc(d[0])}: ${esc(d[1])}"></i>`).join('')}</div><div class="row small muted" style="justify-content:space-between"><span>${esc(days[0][0])}</span><span>${esc(days[days.length - 1][0])}</span></div>` : '<p class="muted">No sign-ups in this period.</p>'}</div>
   <div class="grid2">
     <div class="card"><h3>Pro by source</h3>${kv(s.pro_by_source)}<p class="small muted">play = Google Play, trial = free trial, referral = invite rewards, manual = given here.</p></div>
@@ -80,6 +82,22 @@ async function dash() {
   <div class="card"><h3>Ad cards in period</h3><table><tr><th>Card</th><th>Advertiser</th><th>Shown</th><th>Taps</th><th>Tap rate</th></tr>${(s.ads || []).map((a) => `<tr><td>${esc(a.title)} ${a.active ? '' : '<span class="chip">off</span>'}</td><td>${esc(a.advertiser)}</td><td>${n0(a.impressions)}</td><td>${n0(a.clicks)}</td><td>${a.impressions ? (a.clicks * 100 / a.impressions).toFixed(1) + '%' : '-'}</td></tr>`).join('')}</table></div>
   <div class="card"><h3>Waitlist</h3>${kv(s.waitlist)}</div>`;
   $('days').onchange = (e) => { ST.days = +e.target.value; show('dash'); };
+}
+
+/* App use: phones that opened the app, signed in or not (date only, from the app's daily note). */
+function usageCard(u) {
+  if (!u) return '<div class="card"><h3>App use</h3><p class="muted">Not available yet. Run migration 0025_app_opens.sql in Supabase.</p></div>';
+  const rows = (u.by_day || []).slice(-14).reverse();
+  const today = rows.length ? rows[0][0] : '';
+  return `<div class="card"><h3>App use (phones that opened the app)</h3>
+  <div class="kpis" style="margin-bottom:10px">
+    <div class="kpi"><span>Opened today</span><b>${n0(u.active_today)}</b></div>
+    <div class="kpi"><span>Last 7 days</span><b>${n0(u.active_7d)}</b></div>
+    <div class="kpi"><span>Last 30 days</span><b>${n0(u.active_30d)}</b></div>
+    <div class="kpi"><span>All phones counted</span><b>${n0(u.phones_total)}</b><span>${u.since ? 'since ' + esc(u.since) : ''}</span></div>
+  </div>
+  <table><tr><th>Day</th><th>Opened</th><th>New phones</th><th>Came back next day</th></tr>${rows.map(([d, o, n, b]) => `<tr><td>${esc(d)}</td><td>${n0(o)}</td><td>${n0(n)}</td><td>${d === today ? '<span class="muted">tomorrow</span>' : n ? n0(b) + ' (' + Math.round(b * 100 / n) + '%)' : '-'}</td></tr>`).join('')}</table>
+  <p class="small muted">Counts phones on the new app version only, signed in or not. Each phone is counted once a day when it is online. No names or entries are collected.</p></div>`;
 }
 
 /* ---------- users ---------- */
