@@ -46,9 +46,15 @@ function shell() {
 }
 async function show(t) {
   ST.tab = t; document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.tab === t));
+  const seq = ST.seq = (ST.seq || 0) + 1;
   $('main').innerHTML = '<p class="muted">Loading…</p>';
-  try { await ({ dash, users, kaarigar, ads, plans, admins })[t](); } catch (e) { $('main').innerHTML = `<div class="card"><b>Could not load.</b><p class="muted">${esc(e.message)}</p></div>`; }
+  try { await ({ dash, users, kaarigar, ads, plans, admins })[t](); } catch (e) {
+    if (seq !== ST.seq) return;   // another tab was opened while this one loaded: ignore its late error
+    $('main').innerHTML = `<div class="card"><b>Could not load.</b><p class="muted">${esc(e.message)}</p></div>`;
+  }
 }
+/* A tab that finishes loading after another tab was opened must not draw over it. */
+function stale(t) { return ST.tab !== t || !$('main'); }
 function drawer(html) { $('drawerIn').innerHTML = `<div class="row" style="justify-content:flex-end"><button class="btn" id="dClose">Close</button></div>` + html; $('drawer').classList.add('on'); $('dClose').onclick = closeDrawer; }
 function closeDrawer() { $('drawer').classList.remove('on'); }
 $('drawer').onclick = (e) => { if (e.target.id === 'drawer') closeDrawer(); };
@@ -57,6 +63,7 @@ $('drawer').onclick = (e) => { if (e.target.id === 'drawer') closeDrawer(); };
 async function dash() {
   const s = await rpc('admin_stats', { days: ST.days });
   let u = null; try { u = await rpc('admin_usage', { days: Math.min(ST.days, 180) }); } catch (e) { u = null; }
+  if (stale('dash')) return;
   const pro = s.pro_active || {}, proN = Object.values(pro).reduce((a, b) => a + b, 0);
   const days = s.signups_by_day || [], max = Math.max(1, ...days.map((d) => d[1]));
   const kv = (o) => Object.entries(o || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="row" style="justify-content:space-between"><span>${esc(k)}</span><b>${n0(v)}</b></div>`).join('') || '<p class="muted">None yet</p>';
@@ -105,6 +112,7 @@ async function users() {
   $('main').innerHTML = `<div class="card"><form id="fq" class="row"><input id="uq" placeholder="Search name, email, phone or referral code" value="${esc(ST.uq)}" style="flex:1"><button class="btn pri">Search</button></form></div><div class="card" id="ulist"><p class="muted">Loading…</p></div>`;
   $('fq').onsubmit = (e) => { e.preventDefault(); ST.uq = $('uq').value.trim(); users(); };
   const L = await rpc('admin_users', { q: ST.uq, lim: 100, off: 0 });
+  if (stale('users')) return;
   $('ulist').innerHTML = L.length ? `<table><tr><th>Name</th><th>Email</th><th class="hide-sm">Phone · City</th><th>Plan</th><th class="hide-sm">Family</th><th class="hide-sm">Joined</th></tr>
   ${L.map((u) => `<tr class="click" data-u="${esc(u.user_id)}"><td>${esc(u.name || '-')} ${u.is_admin ? '<span class="chip warn">admin</span>' : ''}</td><td>${esc(u.email)}</td><td class="hide-sm">${esc(u.phone || '')} ${esc(u.city || '')}</td><td>${u.plans ? `<span class="chip ok">${esc(u.plans)}</span>` : '<span class="muted">Free</span>'}</td><td class="hide-sm">${esc(u.family_size || 1)}</td><td class="hide-sm">${dt(u.created_at)}</td></tr>`).join('')}</table>
   <p class="small muted">Showing up to 100. Search to narrow down.</p>` : '<p class="muted">No users found.</p>';
@@ -133,6 +141,7 @@ async function kaarigar() {
   document.querySelectorAll('[data-ls]').forEach((b) => b.onclick = () => { ST.lst = b.dataset.ls; kaarigar(); });
   $('flq').onsubmit = (e) => { e.preventDefault(); ST.lq = $('lq').value.trim(); kaarigar(); };
   const L = await rpc('admin_listings', { p_status: ST.lst, q: ST.lq, lim: 200 });
+  if (stale('kaarigar') || !$('llist')) return;
   $('llist').innerHTML = L.length ? L.map((l) => `<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">${esc(l.name)} <span class="chip">${esc(l.category)}</span> ${l.verified ? '<span class="chip ok">verified</span>' : '<span class="chip warn">not verified</span>'} ${l.active ? '' : '<span class="chip bad">hidden</span>'} ${l.reports ? `<span class="chip bad">${esc(l.reports)} reports</span>` : ''}</h3>
       <div class="small muted">${esc(l.area)} ${esc(l.city)} ${esc(l.pincode)} · ${l.experience != null ? esc(l.experience) + ' yrs · ' : ''}${esc(l.charge_note)} · added ${dt(l.created_at)} via ${esc(l.source)}${l.listed_until ? ' · listed until ' + dt(l.listed_until) : ''}</div>
       ${l.about ? `<div class="small">${esc(l.about)}</div>` : ''}</div>
@@ -149,6 +158,7 @@ async function kaarigar() {
 /* ---------- ad cards ---------- */
 async function ads() {
   const L = await rpc('admin_ads');
+  if (stale('ads')) return;
   $('main').innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Sponsored cards</h2><button class="btn gold" id="newAd" ${W()}>New card</button></div>
   ${L.map((a) => `<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3 style="margin:0">${esc(a.title)} ${a.active ? '<span class="chip ok">on</span>' : '<span class="chip">off</span>'}</h3>
     <div class="small muted">${esc(a.id)} · ${esc(a.advertiser)} · tabs: ${esc((a.placement || []).join(', '))} · cities: ${esc((a.cities || []).join(', ') || 'all India')} · languages: ${esc((a.languages || []).join(', ') || 'all')} · weight ${esc(a.weight)}${a.ends_at ? ' · ends ' + dt(a.ends_at) : ''}</div>
@@ -192,6 +202,7 @@ function adForm(a) {
 /* ---------- plans and settings ---------- */
 async function plans() {
   const [s, P] = await Promise.all([rpc('admin_settings'), rpc('admin_plans').catch(() => null)]);
+  if (stale('plans')) return;
   const tog = (k, l, d) => `<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0"><div><b>${l}</b><div class="small muted">${d}</div></div><button class="btn ${s[k] ? 'pri' : ''}" data-set="${k}" data-v="${!s[k]}" ${W()}>${s[k] ? 'On' : 'Off'}</button></div>`;
   $('main').innerHTML = `<div class="card"><h2>Launch switches</h2>
     ${tog('early_access_pro', 'Pro free for everyone', 'Every signed-in user gets all Pro features. Use only for a launch offer.')}
@@ -226,6 +237,7 @@ async function plans() {
 /* ---------- admins and log ---------- */
 async function admins() {
   const [A, Lg] = await Promise.all([rpc('admin_admins'), rpc('admin_log_list', { lim: 200 })]);
+  if (stale('admins')) return;
   $('main').innerHTML = `<div class="card"><h2>Team</h2><table><tr><th>Email</th><th>Access</th><th>Since</th><th></th></tr>${A.map((a) => `<tr><td>${esc(a.email)}</td><td>${a.role === 'admin' ? 'Admin' : 'View only'}</td><td>${dt(a.added_at)}</td><td>${a.email !== ST.me.email ? `<button class="btn bad" data-rm="${esc(a.email)}" ${W()}>Remove</button>` : ''}</td></tr>`).join('')}</table>
     <form id="fAdm" class="row" style="margin-top:12px"><input id="admEmail" type="email" placeholder="Their email (they must have signed in to the app once)" style="flex:1" required><select id="admRole"><option value="viewer">View only</option><option value="admin">Admin</option></select><button class="btn gold" ${W()}>Add</button></form></div>
   <div class="card"><h2>Activity log</h2>${Lg.length ? `<table><tr><th>When</th><th>Who</th><th>What</th><th class="hide-sm">Details</th></tr>${Lg.map((l) => `<tr><td>${dtt(l.at)}</td><td class="small">${esc(l.admin_email)}</td><td>${esc(l.action.replace(/_/g, ' '))} <span class="small muted">${esc(String(l.target).slice(0, 40))}</span></td><td class="hide-sm small muted">${esc(JSON.stringify(l.detail).slice(0, 120))}</td></tr>`).join('')}</table>` : '<p class="muted">Nothing yet.</p>'}</div>`;
