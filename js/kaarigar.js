@@ -17,6 +17,17 @@ $('locBtn').onclick = () => {
     () => { $('locTxt').textContent = 'Could not get location. Pincode is enough.'; },
     { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 });
 };
+/* Google Ads conversion: a kaarigar listed (form) or chose to list via WhatsApp. */
+const SEND_TO = 'AW-18547819247/xzB8CK2-v7sdEO-FpYxF';
+const convert = () => { if (window.gtag) gtag('event', 'conversion', { send_to: SEND_TO }); };
+/* WhatsApp fallback: opens a chat with Roz Hisaab, filled with whatever is typed so far. */
+const waMsg = () => {
+  const c = (document.querySelector('input[name=cat]:checked') || {}).value;
+  const work = c ? CATS.find((x) => x[0] === c)[1] : '';
+  const where = [$('area').value.trim(), $('city').value.trim(), $('pin').value.trim()].filter(Boolean).join(', ');
+  return `Hi, I want to list my work on Roz Hisaab. Name: ${$('name').value.trim()}, Work: ${work}, Area/Pincode: ${where}`;
+};
+$('waList').addEventListener('click', () => { $('waList').href = 'https://wa.me/919625746088?text=' + encodeURIComponent(waMsg()); convert(); });
 const fail = (t) => { const m = $('msg'); m.textContent = t; m.className = 'msg full err'; m.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
 const digits = (x) => x.replace(/\D/g, '').slice(-10);
 $('f').onsubmit = async (e) => {
@@ -31,7 +42,6 @@ $('f').onsubmit = async (e) => {
   if (body.p_name.length < 2) return fail('Please enter your name or business name. / अपना नाम लिखें।');
   if (!cat) return fail('Please choose your work. / अपना काम चुनें।');
   if (!/^[6-9]\d{9}$/.test(body.p_phone)) return fail('Please enter a valid 10-digit mobile number. / सही मोबाइल नंबर लिखें।');
-  if (body.p_city.length < 2) return fail('Please enter your city or town. / शहर लिखें।');
   if (!/^[1-9]\d{5}$/.test(body.p_pincode)) return fail('Please enter a valid 6-digit pincode. / सही पिनकोड लिखें।');
   if (!body.p_consent) return fail('Please tick the box to agree. / सहमति के बॉक्स पर टिक करें।');
   if (SB_URL.startsWith('REPLACE')) return fail('Registration opens soon. Please WhatsApp us for now.');
@@ -40,10 +50,13 @@ $('f').onsubmit = async (e) => {
     const r = await fetch(SB_URL.replace(/\/$/, '') + '/rest/v1/rpc/register_helper', {
       method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || 'Something went wrong. Please try again.'); }
-    const text = `Namaste! I am now listed on Roz Hisaab as a ${CATS.find((c) => c[0] === cat)[1].toLowerCase()} in ${body.p_city}. Download the free app to find me and other trusted kaarigars near you: https://rozhisaab.in`;
+    convert();
+    const text = `Namaste! I am now listed on Roz Hisaab as a ${CATS.find((c) => c[0] === cat)[1].toLowerCase()} in ${body.p_city || body.p_area || 'pincode ' + body.p_pincode}. Download the free app to find me and other trusted kaarigars near you: https://rozhisaab.in`;
     $('share').href = 'https://wa.me/?text=' + encodeURIComponent(text);
     $('f').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
+    // If the server still asks for a city, open the extra details and point to the City field.
+    if (/city/i.test(err.message || '')) { document.querySelector('.more').open = true; $('city').focus(); return fail('Please enter your city or town in "Add more details". / "और जानकारी" में शहर लिखें।'); }
     fail(err.message);
   } finally { $('go').disabled = false; $('go').textContent = 'List me free · मुफ़्त लिस्ट करें'; }
 };
