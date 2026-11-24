@@ -17,6 +17,14 @@ $('locBtn').onclick = () => {
     () => { $('locTxt').textContent = 'Could not get location. Pincode is enough.'; },
     { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 });
 };
+/* Google Ads click id: kept for this visit so it can be saved with the listing (offline conversions later). */
+const GCLID = (() => {
+  try {
+    const g = new URLSearchParams(location.search).get('gclid');
+    if (g && /^[A-Za-z0-9_-]{10,200}$/.test(g)) sessionStorage.setItem('rh_gclid', g);
+    return sessionStorage.getItem('rh_gclid') || '';
+  } catch (e) { return ''; }
+})();
 /* Google Ads conversion: a kaarigar listed (form) or chose to list via WhatsApp. */
 const SEND_TO = 'AW-18547819247/xzB8CK2-v7sdEO-FpYxF';
 const convert = () => { if (window.gtag) gtag('event', 'conversion', { send_to: SEND_TO }); };
@@ -51,6 +59,9 @@ $('f').onsubmit = async (e) => {
       method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || 'Something went wrong. Please try again.'); }
     convert();
+    if (GCLID) fetch(SB_URL.replace(/\/$/, '') + '/rest/v1/rpc/attach_helper_gclid', {
+      method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_phone: body.p_phone, p_gclid: GCLID }) }).catch(() => {});
     const text = `Namaste! I am now listed on Roz Hisaab as a ${CATS.find((c) => c[0] === cat)[1].toLowerCase()} in ${body.p_city || body.p_area || 'pincode ' + body.p_pincode}. Download the free app to find me and other trusted kaarigars near you: https://rozhisaab.in`;
     $('share').href = 'https://wa.me/?text=' + encodeURIComponent(text);
     $('f').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
