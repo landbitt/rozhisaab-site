@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src https://bbuixnyompmraelkjlvr.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src https://bbuixnyompmraelkjlvr.supabase.co https://www.google.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://googleads.g.doubleclick.net https://*.doubleclick.net; frame-src https://td.doubleclick.net https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>List yourself free | Roz Hisaab Kaarigar</title>
 <meta name="description" content="Plumbers, electricians, carpenters, AC and RO technicians, painters and other kaarigars: list yourself free on Roz Hisaab and get calls from homes near you.">
@@ -45,6 +45,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--brand2);outline-
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1D1400;font:inherit;font-weight:600;font-size:17px;padding:14px 22px;border-radius:14px;border:0;text-decoration:none;cursor:pointer;min-height:52px}
 .btn.alt{background:var(--brand2);color:#fff}
 .btn:disabled{opacity:.6}
+.more{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--field)}
+.more summary{font-weight:600;font-size:15px;cursor:pointer}
+.more summary small{font-weight:400;color:var(--muted);font-size:14px}
+.moregrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.btn.wa{background:transparent;color:var(--ink);border:1px solid var(--line);font-size:16px;min-height:48px}
 .msg{border-radius:12px;padding:10px 12px;font-size:15px;display:none}
 .msg.err{display:block;background:#FDECEA;color:#8C1D18}
 .ok{display:none;text-align:center}
@@ -59,6 +64,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--brand2);outline-
 footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:center}
 @media (max-width:560px){form{grid-template-columns:1fr}.cats{grid-template-columns:repeat(3,1fr)}}
 </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18547819247"></script>
+<script src="js/gtag.js"></script>
 </head>
 <body>
 <header>
@@ -77,17 +84,22 @@ footer{color:var(--muted);font-size:14px;padding-block:24px 40px;text-align:cent
       <div class="full"><div style="font-weight:600;font-size:15px;margin-bottom:6px">Your work <small style="font-weight:400;color:var(--muted)">आपका काम</small></div>
         <div class="cats" id="cats"></div></div>
       <label>Mobile number <small>मोबाइल नंबर</small><input id="phone" required inputmode="tel" maxlength="17" autocomplete="tel" placeholder="10 digits"></label>
-      <label>WhatsApp number <small>अगर अलग है</small><input id="wa" inputmode="tel" maxlength="17" placeholder="Same as mobile"></label>
-      <label>City or town <small>शहर या कस्बा</small><input id="city" required maxlength="60" autocomplete="address-level2" placeholder="e.g. Bhiwani"></label>
       <label>Pincode <small>पिनकोड</small><input id="pin" required inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="6 digits"></label>
+      <details class="more full"><summary>Add more details (optional) <small>और जानकारी (वैकल्पिक)</small></summary>
+        <div class="moregrid">
+      <label>WhatsApp number <small>अगर अलग है</small><input id="wa" inputmode="tel" maxlength="17" placeholder="Same as mobile"></label>
+      <label>City or town <small>शहर या कस्बा</small><input id="city" maxlength="60" autocomplete="address-level2" placeholder="e.g. Bhiwani"></label>
       <label class="full">Area or locality <small>इलाका, मोहल्ला</small><input id="area" maxlength="80" placeholder="e.g. Sector 4, Old Bus Stand"></label>
       <div class="full row"><button type="button" class="loc" id="locBtn">📍 Add my shop location (optional) · लोकेशन जोड़ें</button><span id="locTxt" style="font-size:14px;color:var(--muted)"></span></div>
       <label>Visit charge or monthly fee <small>विज़िट चार्ज या फीस</small><input id="charge" maxlength="40" placeholder="e.g. ₹200 visit"></label>
       <label>Years of experience <small>कितने साल का अनुभव</small><input id="exp" type="number" min="0" max="60" inputmode="numeric" placeholder="e.g. 8"></label>
       <label class="full">About your work (optional) <small>अपने काम के बारे में</small><textarea id="about" maxlength="200" placeholder="e.g. Bathroom fittings, motor repair, available on Sundays"></textarea></label>
+        </div>
+      </details>
       <label class="consent full"><input type="checkbox" id="consent"><span>I agree that my name, work, area and phone number will be shown to people using the Roz Hisaab app near me, so they can call me. I can ask for my listing to be removed at any time. <a href="privacy.html">Privacy policy</a></span></label>
       <div class="msg full" id="msg" role="alert"></div>
       <button class="btn full" id="go" type="submit">List me free · मुफ़्त लिस्ट करें</button>
+      <a class="btn wa full" id="waList" href="https://wa.me/919625746088" target="_blank" rel="noopener">Or list via WhatsApp · WhatsApp पर लिस्ट करें</a>
     </form>
 
     <div class="ok" id="ok">
