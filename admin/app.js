@@ -134,7 +134,13 @@ async function kaarigar() {
   $('flq').onsubmit = (e) => { e.preventDefault(); ST.lq = $('lq').value.trim(); kaarigar(); };
   const L = await rpc('admin_listings', { p_status: ST.lst, q: ST.lq, lim: 200 });
   $('llist').innerHTML = L.length ? L.map((l) => `<div class="card"><div class="row" style="justify-content:space-between"><div><h3 style="margin:0">${esc(l.name)} <span class="chip">${esc(l.category)}</span> ${l.verified ? '<span class="chip ok">verified</span>' : '<span class="chip warn">not verified</span>'} ${l.active ? '' : '<span class="chip bad">hidden</span>'} ${l.reports ? `<span class="chip bad">${esc(l.reports)} reports</span>` : ''}</h3>
-      <div class="small muted">${esc(l.area)} ${esc(l.city)} ${esc(l.pincode)} · ${l.experience != null ? esc(l.experience) + ' yrs · ' : ''}${esc(l.charge_note)} · added ${dt(l.created_at)} via ${esc(l.source)}${l.listed_until ? ' · listed until ' + dt(l.listed_until) : ''}</div>
+      <div class="small muted">${[
+        [l.area, l.city, l.pincode].map(v => String(v ?? '').trim()).filter(Boolean).map(esc).join(' '),
+        l.experience != null && l.experience !== '' ? esc(l.experience) + ' yrs' : '',
+        String(l.charge_note ?? '').trim() ? esc(l.charge_note) : '',
+        'added ' + dt(l.created_at) + (l.source ? ' via ' + esc(l.source) : ''),
+        l.listed_until ? 'listed until ' + dt(l.listed_until) : ''
+      ].filter(Boolean).join(' · ')}</div>
       ${l.about ? `<div class="small">${esc(l.about)}</div>` : ''}</div>
       <div class="row"><a class="btn" href="tel:+91${esc(l.phone)}">Call ${esc(l.phone)}</a>${l.whatsapp || l.phone ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/91${esc(l.whatsapp || l.phone)}">WhatsApp</a>` : ''}</div></div>
     <div class="row" style="margin-top:10px">${l.verified ? `<button class="btn" data-la="unverify" data-id="${esc(l.id)}" ${W()}>Remove verified</button>` : `<button class="btn pri" data-la="verify" data-id="${esc(l.id)}" ${W()}>Verify</button>`}
